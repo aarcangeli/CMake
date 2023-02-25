@@ -453,6 +453,18 @@ bool cmMakefile::ExecuteCommand(const cmListFileFunction& lff,
       if (this->GetCMakeInstance()->GetTrace()) {
         this->PrintCommandTrace(lff, this->Backtrace.Top().DeferId);
       }
+
+#if HAVE_DAP
+      if (auto* debugger = this->GetCMakeInstance()->GetDebugServer()) {
+        const cmListFileContext& context = this->Backtrace.Top();
+        cmake_dap::FrameLocation location;
+        location.name = context.Name;
+        location.filePath = context.FilePath;
+        location.line = context.Line;
+        debugger->SourceReached(location);
+      }
+#endif
+
       // Try invoking the command.
       bool invokeSucceeded = command(lff.Arguments(), status);
       bool hadNestedError = status.GetNestedError();

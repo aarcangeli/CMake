@@ -929,6 +929,29 @@ void cmake::SetArgs(const std::vector<std::string>& args)
                        return true;
                      } },
 
+#if HAVE_DAP
+    CommandArgument{
+      "--dap-connect", CommandArgument::Values::One,
+      [](std::string const& value, cmake* state) -> bool {
+        if (state->GetDebugServer() != nullptr) {
+          cmSystemTools::Error("Multiple --dap-connect not allowed");
+          return false;
+        }
+        auto debugServer = cmake_dap::CMakeDapServer::create();
+        if (!debugServer->SetConnectAddress(value)) {
+          cmSystemTools::Error(
+            "Expected --dap-connect=PORT or --dap-connect=HOST:PORT");
+          return false;
+        }
+        if (!debugServer->Start()) {
+          cmSystemTools::Error("Connection failed");
+          return false;
+        }
+        state->SetDebugServer(std::move(debugServer));
+        return true;
+      } },
+#endif
+
     CommandArgument{ "--log-level", "Invalid level specified for --log-level",
                      CommandArgument::Values::One,
                      [](std::string const& value, cmake* state) -> bool {

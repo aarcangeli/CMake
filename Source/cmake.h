@@ -47,6 +47,10 @@ class cmMessenger;
 class cmVariableWatch;
 struct cmDocumentationEntry;
 
+#if HAVE_DAP
+#  include "cmake_dap/cmake_dap_server.h"
+#endif
+
 /** \brief Represents a cmake invocation.
  *
  * This class represents a cmake invocation. It is the top level class when
@@ -497,6 +501,17 @@ public:
   bool GetCheckSystemVars() const { return this->CheckSystemVars; }
   void SetCheckSystemVars(bool b) { this->CheckSystemVars = b; }
 
+#if HAVE_DAP
+  cmake_dap::CMakeDapServer* GetDebugServer() const
+  {
+    return DebugServer.get();
+  }
+  void SetDebugServer(std::unique_ptr<cmake_dap::CMakeDapServer> b)
+  {
+    DebugServer = std::move(b);
+  }
+#endif
+
   void MarkCliAsUsed(const std::string& variable);
 
   /** Get the list of configurations (in upper case) considered to be
@@ -674,6 +689,10 @@ private:
     UnprocessedPresetVariables;
   std::map<std::string, cm::optional<std::string>>
     UnprocessedPresetEnvironment;
+#endif
+
+#if HAVE_DAP
+  std::unique_ptr<cmake_dap::CMakeDapServer> DebugServer;
 #endif
 
 #if !defined(CMAKE_BOOTSTRAP)

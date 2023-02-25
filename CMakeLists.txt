@@ -893,3 +893,7 @@ if(NOT CMake_TEST_EXTERNAL_CMAKE)
     install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/Source/CMakeInstallSignTool.cmake)
   endif()
 endif()
+
+# Add cmake-dap integration
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/CMakeDap")
+target_link_libraries(CMakeLib CMakeDap)

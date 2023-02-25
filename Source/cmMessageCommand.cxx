@@ -177,6 +177,13 @@ bool cmMessageCommand(std::vector<std::string> const& args,
 
   auto message = cmJoin(cmMakeRange(i, args.cend()), "");
 
+  if (auto* server = mf.GetCMakeInstance()->GetDebugServer()) {
+    cmake_dap::MessageEvent event;
+    event.message = message;
+    event.level = cmake_dap::LogLevel(level);
+    server->OnMessage(event);
+  }
+
   switch (level) {
     case cmake::LogLevel::LOG_ERROR:
     case cmake::LogLevel::LOG_WARNING:
